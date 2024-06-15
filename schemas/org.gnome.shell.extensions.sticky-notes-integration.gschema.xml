@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="org.gnome.shell.extensions.sticky-notes-integration" path="/org/gnome/shell/extensions/sticky-notes-integration/">
+        <!-- ////////////////////////////////////////////////////// -->
+
+        <!-- app interface -->
+        <key name="auto-start" type="b">
+          <default>false</default>
+          <summary>Start Sticky Notes when user logs in</summary>
+        </key>
+
+        <key name="keep-alive" type="b">
+          <default>false</default>
+          <summary>Have Sticky Notes active at all times</summary>
+        </key>
+
+        <!-- ////////////////////////////////////////////////////// -->
+
+        <!-- background menu override -->
+        <key name="override-background-menu" type="i">
+          <default>2</default>
+          <summary>How/When to add 'New Notes' to Gnome background menu</summary>
+        </key>
+
+        <!-- ////////////////////////////////////////////////////// -->
+
+        <!-- @todo prepend all indicator setting swith panel-indicator- -->
+        <!-- indicator appearance -->
+        <key name="show-panel-indicator" type="i">
+          <default>2</default>
+          <summary>How/When to show panel indicator</summary>
+        </key>
+
+        <key name="show-open-note-count" type="b">
+          <default>false</default>
+          <summary>Show number of open notes in indicator</summary>
+        </key>
+
+        <key name="use-builtin-icon" type="b">
+          <default>false</default>
+          <summary>Prefer packaged icon over system theme</summary>
+        </key>
+
+        <key name="panel-indicator-position" type="i">
+          <default>2</default>
+          <summary>Position in the panel (left|center|right|system)</summary>
+        </key>
+
+        <key name="panel-indicator-position-order" type="i">
+          <default>0</default>
+          <summary>Indicator position/alignment index</summary>
+        </key>
+
+        <!-- ////////////////////////////////////////////////////// -->
+
+        <!-- indicator actions -->
+        <key name="left-button-press-action" type="i">
+          <default>0</default>
+          <summary>Action on left button press</summary>
+        </key>
+
+        <key name="middle-button-press-action" type="i">
+          <default>0</default>
+          <summary>Action on middle button press</summary>
+        </key>
+
+        <key name="right-button-press-action" type="i">
+          <default>0</default>
+          <summary>Action on right button press</summary>
+        </key>
+
+        <key name="scroll-up-action" type="i">
+          <default>0</default>
+          <summary>Action on mouse scroll</summary>
+        </key>
+
+        <key name="scroll-down-action" type="i">
+          <default>0</default>
+          <summary>Action on mouse scroll</summary>
+        </key>
+
+    </schema>
+</schemalist>

@@ -1,0 +1,12 @@
+{
+  "name": "Sticky Notes Integration",
+  "description": "Gnome Shell extension providing integration for Sticky Notes",
+  "uuid": "sticky-notes-integration@joaocandre",
+  "shell-version": [
+    "46"
+  ],
+  "settings-schema": "org.gnome.shell.extensions.sticky-notes-integration",
+  "url": "https://github.com/joaocandre/sticky-notes-integration",
+  "version": 1,
+  "version-name": "0.1"
+}
