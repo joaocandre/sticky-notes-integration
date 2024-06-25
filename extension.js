@@ -13,30 +13,24 @@ export default class StickyNotesIntegrationExtension extends Extension {
     /// @brief Enables 'Sticky Notes Integration' extension.
     ///
     enable() {
-        try {
-            this._settings = this.getSettings();
+        this._settings = this.getSettings();
 
-            this._sticky_notes = new StickyNotesInterface(this);
-            this._sticky_notes.track();
+        this._sticky_notes = new StickyNotesInterface(this);
+        this._sticky_notes.track();
 
-            this._sticky_indicator = new StickyNotesIndicator(this, this._sticky_notes);
-            this._sticky_indicator.enable();
+        this._sticky_indicator = new StickyNotesIndicator(this, this._sticky_notes);
+        this._sticky_indicator.enable();
 
-            this._background_menu = new BackgroundMenuOverride(this, this._sticky_notes);
-            this._background_menu.enable();
-
-        } catch (error) {
-            this.disable();
-            console.error(error);
-
-            throw error;
-        }
+        this._background_menu = new BackgroundMenuOverride(this, this._sticky_notes);
+        this._background_menu.enable();
     }
 
     //--------------------------------------------------------------------------
     /// @brief Disables 'Sticky Notes Integration' extension.
     ///
     disable() {
+        this._settings = null;
+
         this._sticky_notes?.untrack();
         this._sticky_notes = null;
 

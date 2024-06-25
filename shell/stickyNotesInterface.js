@@ -303,6 +303,7 @@ export const StickyNotesInterface = GObject.registerClass({
         if (MultiWindowHandler.count(AppInfo['wm-class'], true)) {
             this.hide();
         } else {
+            // @todo if already showing, bring to front (window.raise())
             this.show();
         }
     }

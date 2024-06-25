@@ -136,35 +136,42 @@ export default class StickyNotesIntegrationPreferences extends ExtensionPreferen
         window.search_enabled = true;
 
         // 'General'
-        this._general_page = new Adw.PreferencesPage({
+        const general_page = new Adw.PreferencesPage({
             title: _('General'),
             icon_name: 'preferences-system-symbolic'
         });
-        window.add(this._general_page);
-        this._general_groups = fillGeneralPage(this._general_page, this.getSettings());
+        window.add(general_page);
+        this._general_groups = fillGeneralPage(general_page, this.getSettings());
 
         // 'Indicator'
-        this._indicator_page = new Adw.PreferencesPage({
+        const indicator_page = new Adw.PreferencesPage({
             title: _('Indicator'),
             icon_name: 'view-pin-symbolic'
         });
-        window.add(this._indicator_page);
-        this._indicator_groups = fillIndicatorPage(this._indicator_page, this.getSettings());
+        window.add(indicator_page);
+        this._indicator_groups = fillIndicatorPage(indicator_page, this.getSettings());
 
         // 'About' page
-        this._about_page = new Adw.PreferencesPage({
+        const about_page = new Adw.PreferencesPage({
             title: _('About'),
             icon_name: 'dialog-information-symbolic',
         });
-        window.add(this._about_page);
-        this._about_groups = fillAboutPage(this._about_page, this.metadata);
+        window.add(about_page);
+        this._about_groups = fillAboutPage(about_page, this.metadata);
 
         // check if Sticky Notes is installed, disable all settings if not
         if (!is_available(AppInfo['process'])) {
             this.disable();
-            UI.addErrorBox(this._general_page, 'Sticky Notes is not installed');
+            UI.addErrorBox(general_page, 'Sticky Notes is not installed');
             return;
         }
+
+        // clean member instances on window close
+        window.connect('close-request', () => {
+            this._general_groups = null;
+            this._indicator_groups = null;
+            this._about_groups = null;
+        });
     }
 
     disable() {

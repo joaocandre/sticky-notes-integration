@@ -54,7 +54,7 @@ export const MultiWindowHandler = GObject.registerClass({
     }
 
     //--------------------------------------------------------------------------
-    /// @brief  Get number of windows matching given *wm_class*.
+    /// @brief  Get number of *active* windows matching given *wm_class*.
     ///
     /// @note   Simpler alternative to get().length (with slightly less overhead).
     ///
@@ -66,7 +66,7 @@ export const MultiWindowHandler = GObject.registerClass({
 
         for (const actor of global.get_window_actors()) {
             const window = actor.get_meta_window();
-            if (active_only && window.is_hidden()) {
+            if (active_only && window.is_hidden()) {  // @todo use !window.is_above() instead of is_hidden()
                 continue;
             }
             if (window.get_wm_class() === wm_class) {
