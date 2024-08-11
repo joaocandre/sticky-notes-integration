@@ -104,12 +104,11 @@ function fillAboutPage(page, metadata) {
     const extension_version = metadata['version-name'] ?? metadata['version'].toString();
     const extension_version_icon_name = (extension_version ? 'adw-external-link-symbolic' :  'dialog-error-symbolic');
     const sticky_version = AppInfo['version'];
-    const sticky_version_icon_name = (sticky_version ? 'adw-external-link-symbolic' :  'dialog-error-symbolic');
 
     UI.addRow(info_group, 'Version', '', [ new Gtk.Label({ label: `${extension_version}` }),
                                            new Gtk.LinkButton({ icon_name: extension_version_icon_name, uri: metadata['url'] }) ]);
     UI.addRow(info_group, 'Sticky Notes Version', '', [ new Gtk.Label({ label: `${sticky_version}` }),
-                                                        new Gtk.LinkButton({ icon_name: sticky_version_icon_name, uri: 'https://flathub.org/apps/com.vixalien.sticky' }) ]);
+                                                        new Gtk.LinkButton({ icon_name: 'adw-external-link-symbolic', uri: 'https://flathub.org/apps/com.vixalien.sticky' }) ]);
     UI.addRow(info_group, 'GNOME Version', '', [ new Gtk.Label({ label: `${Config.PACKAGE_VERSION.toString()}` }),
                                                  new Gtk.LinkButton({ icon_name: 'adw-external-link-symbolic', uri: `https://release.gnome.org/${Config.PACKAGE_VERSION.toString().split('.')[0]}` }) ]);
     UI.addRow(info_group, 'Author', '', [ new Gtk.Label({ label: 'João André' }),
@@ -160,6 +159,7 @@ export default class StickyNotesIntegrationPreferences extends ExtensionPreferen
         this._about_groups = fillAboutPage(about_page, this.metadata);
 
         // check if Sticky Notes is installed, disable all settings if not
+        // @todo check became redundant as of newer version, replace with just if(AppInfo['process'])
         if (!is_available(AppInfo['process'])) {
             this.disable();
             UI.addErrorBox(general_page, 'Sticky Notes is not installed');
