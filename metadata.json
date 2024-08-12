@@ -8,5 +8,5 @@
   "settings-schema": "org.gnome.shell.extensions.sticky-notes-integration",
   "url": "https://github.com/joaocandre/sticky-notes-integration",
   "version": 1,
-  "version-name": "0.1.2"
+  "version-name": "0.1.3"
 }
