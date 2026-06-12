@@ -50,9 +50,13 @@ export const BackgroundMenuOverride = GObject.registerClass({
         this._on_monitors_changed_id = Main.layoutManager.connect('monitors-changed', this._update.bind(this));
         this._on_startup_complete_id = Main.layoutManager.connect('startup-complete', this._update.bind(this));
         this._on_session_mode_updated_id = Main.sessionMode.connect('updated', this._update.bind(this));
-        this._on_locked_changed_id = Main.screenShield.connect('locked-changed', this._update.bind(this));
-        this._on_active_changed_id = Main.screenShield.connect('active-changed', this._update.bind(this));
-        this._on_wake_up_screen_id = Main.screenShield.connect('wake-up-screen', this._update.bind(this));
+
+        // screenShield is null when the session has no lock screen (e.g. kiosk mode, some Wayland compositors)
+        if (Main.screenShield) {
+            this._on_locked_changed_id = Main.screenShield.connect('locked-changed', this._update.bind(this));
+            this._on_active_changed_id = Main.screenShield.connect('active-changed', this._update.bind(this));
+            this._on_wake_up_screen_id = Main.screenShield.connect('wake-up-screen', this._update.bind(this));
+        }
 
         this._update();
     }
@@ -63,7 +67,9 @@ export const BackgroundMenuOverride = GObject.registerClass({
     /// @return     {boolean}  True if overriden, False otherwise.
     ///
     _isOverriden() {
-        return(Main.layoutManager._bgManagers[0].backgroundActor._backgroundMenu.numMenuItems > BackgroundMenuOverride._DEFAULT_BGMENU_ITEMS);
+        const bgMenu = Main.layoutManager._bgManagers?.[0]?.backgroundActor?._backgroundMenu;
+        if (!bgMenu) return false;
+        return bgMenu.numMenuItems > BackgroundMenuOverride._DEFAULT_BGMENU_ITEMS;
     }
 
     //--------------------------------------------------------------------------
@@ -75,7 +81,7 @@ export const BackgroundMenuOverride = GObject.registerClass({
         if (should_override && !this._isOverriden()) {
             this.apply();
         } else if (!should_override && this._isOverriden()) {
-            this.revert();
+            this._removeMenuItems();
         }
     }
 
@@ -117,28 +123,37 @@ export const BackgroundMenuOverride = GObject.registerClass({
     }
 
     //--------------------------------------------------------------------------
-    /// @brief Reverts Gnome's default background menu to default state / removes override.
+    /// @brief Removes only the injected menu items, leaving signal listeners intact.
+    ///        Used by _update() so that the update cycle remains functional after removal.
     ///
-    /// @note  If menu on default state, does nothing.
-    ///
-    revert() {
+    _removeMenuItems() {
         if (!this._isOverriden()) {
             return;
         }
 
-        console.debug('Reverting background menu');
+        console.debug('Removing background menu override items');
 
         this._new_note_menu_item?.destroy();
         this._separator_menu_item?.destroy();
         this._background_menu = null;
+    }
+
+    //--------------------------------------------------------------------------
+    /// @brief Reverts Gnome's default background menu and disconnects all signal listeners.
+    ///        Should only be called from disable().
+    ///
+    revert() {
+        this._removeMenuItems();
 
         safe_disconnect(this._settings, this._on_settings_change_id);
         safe_disconnect(this._sticky_notes, this._on_active_change_id);
         safe_disconnect(Main.layoutManager, this._on_monitors_changed_id);
         safe_disconnect(Main.layoutManager, this._on_startup_complete_id);
         safe_disconnect(Main.sessionMode, this._on_session_mode_updated_id);
-        safe_disconnect(Main.screenShield, this._on_locked_changed_id);
-        safe_disconnect(Main.screenShield, this._on_active_changed_id);
-        safe_disconnect(Main.screenShield, this._on_wake_up_screen_id);
+        if (Main.screenShield) {
+            safe_disconnect(Main.screenShield, this._on_locked_changed_id);
+            safe_disconnect(Main.screenShield, this._on_active_changed_id);
+            safe_disconnect(Main.screenShield, this._on_wake_up_screen_id);
+        }
     }
 });

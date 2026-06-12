@@ -8,7 +8,7 @@ import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/
 
 import * as UI from './lib/ui.js';
 import { is_available, get_autostart, set_autostart, execute } from './lib/utils.js';
-import { AppInfo, Visibility, PanelPosition, StickyNotesAction } from './lib/globals.js';
+import { AppInfo, Visibility, PanelPosition, StickyNotesAction, get_version } from './lib/globals.js';
 
 //------------------------------------------------------------------------------
 /// @brief Fill preferences page with general/behavior settings
@@ -103,7 +103,7 @@ function fillAboutPage(page, metadata) {
     // get/parse extension and app versions
     const extension_version = metadata['version-name'] ?? metadata['version'].toString();
     const extension_version_icon_name = (extension_version ? 'adw-external-link-symbolic' :  'dialog-error-symbolic');
-    const sticky_version = AppInfo['version'];
+    const sticky_version = get_version();
 
     UI.addRow(info_group, 'Version', '', [ new Gtk.Label({ label: `${extension_version}` }),
                                            new Gtk.LinkButton({ icon_name: extension_version_icon_name, uri: metadata['url'] }) ]);

@@ -67,13 +67,16 @@ export const StickyNotesIndicator = GObject.registerClass({
         this.menu.addMenuItem(this._active_menu);
         this.menu.addMenuItem(this._inactive_menu);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());  // ------------
-        this.menu.addAction(_('Preferences'), () => this._extension.openPreferences());
+        this.menu.addAction(_('Preferences'), () => this._extension.openPreferences().catch(e => console.error(e)));
 
         // initialize quick action bindings
         this._bindings = { };
+        this._stickySignalIds = [];
+        this._settingsSignalIds = [];
+
         for (const key of Object.values(TriggerKey)) {
             this._bindAction(key);
-            this._settings.connect('changed::' + key, this._bindAction.bind(this, key));
+            this._settingsSignalIds.push(this._settings.connect('changed::' + key, this._bindAction.bind(this, key)));
         }
         this._last_event = null;
         this._button_press_handler_id = this.connect('button-press-event', this._onButtonPress.bind(this));
@@ -88,23 +91,23 @@ export const StickyNotesIndicator = GObject.registerClass({
         this._updateVisibility();
 
         // update/load indicator icon on change to active status or changes in 'use-builtin-icon' setting respectively
-        this._sticky_notes.connect('notify::active', this._updateIcon.bind(this));
-        this._settings.connect('changed::use-builtin-icon', this._loadIcons.bind(this));
+        this._stickySignalIds.push(this._sticky_notes.connect('notify::active', this._updateIcon.bind(this)));
+        this._settingsSignalIds.push(this._settings.connect('changed::use-builtin-icon', this._loadIcons.bind(this)));
 
         // update indicator label on change to active status or changes in 'use-builtin-icon' setting
-        this._sticky_notes.connect('notify::n-windows', this._updateLabel.bind(this));
-        this._settings.connect('changed::show-open-note-count', this._updateLabel.bind(this));
+        this._stickySignalIds.push(this._sticky_notes.connect('notify::n-windows', this._updateLabel.bind(this)));
+        this._settingsSignalIds.push(this._settings.connect('changed::show-open-note-count', this._updateLabel.bind(this)));
 
         // update menu entries on change to active status
-        this._sticky_notes.connect('notify::active', this._updateMenu.bind(this));
+        this._stickySignalIds.push(this._sticky_notes.connect('notify::active', this._updateMenu.bind(this)));
 
         // update indicator position in panel on change in 'panel-indicator-position' setting
-        this._settings.connect('changed::panel-indicator-position', this._updatePosition.bind(this));
-        this._settings.connect('changed::panel-indicator-position-order', this._updatePosition.bind(this));
+        this._settingsSignalIds.push(this._settings.connect('changed::panel-indicator-position', this._updatePosition.bind(this)));
+        this._settingsSignalIds.push(this._settings.connect('changed::panel-indicator-position-order', this._updatePosition.bind(this)));
 
         // update indicator visibility on change in 'show-panel-indicator' settting
-        this._sticky_notes.connect('notify::active', this._updateVisibility.bind(this));
-        this._settings.connect('changed::show-panel-indicator', this._updateVisibility.bind(this));
+        this._stickySignalIds.push(this._sticky_notes.connect('notify::active', this._updateVisibility.bind(this)));
+        this._settingsSignalIds.push(this._settings.connect('changed::show-panel-indicator', this._updateVisibility.bind(this)));
     }
 
     //--------------------------------------------------------------------------
@@ -112,6 +115,21 @@ export const StickyNotesIndicator = GObject.registerClass({
     ///
     enable() {
         Main.panel.addToStatusArea(this._extension.uuid, this);
+    }
+
+    //--------------------------------------------------------------------------
+    /// @brief Disconnects all tracked signals and destroys the indicator.
+    ///
+    destroy() {
+        for (const id of this._stickySignalIds)
+            this._sticky_notes.disconnect(id);
+        this._stickySignalIds = [];
+
+        for (const id of this._settingsSignalIds)
+            this._settings.disconnect(id);
+        this._settingsSignalIds = [];
+
+        super.destroy();
     }
 
     //--------------------------------------------------------------------------
@@ -315,10 +333,10 @@ export const StickyNotesIndicator = GObject.registerClass({
     _onScroll(_, event) {
         switch (event.get_scroll_direction()) {
             case Clutter.ScrollDirection.UP:
-                this._bindings[TriggerKey['Scroll Up']]();
+                this._bindings[TriggerKey['Scroll Up']]?.();
                 break;
             case Clutter.ScrollDirection.DOWN:
-                this._bindings[TriggerKey['Scroll Down']]();
+                this._bindings[TriggerKey['Scroll Down']]?.();
                 break;
         }
 
